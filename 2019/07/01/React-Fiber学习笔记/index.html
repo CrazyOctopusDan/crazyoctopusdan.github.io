@@ -1,0 +1,133 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="React-Fiber学习笔记"><meta name="keywords" content="React"><meta name="author" content="张熠"><meta name="copyright" content="张熠"><title>React-Fiber学习笔记 | Codan's Blog</title><link rel="shortcut icon" href="/img/zhangyi.png"><link rel="stylesheet" href="/css/index.css?version=1.6.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.6.1"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"╥﹏╥木有找到: ${query}"}},
+  copy: {
+    success: '复制成功！',
+    error: '复制失败了',
+    noSupport: '当前浏览器并不支持~'
+  }
+} </script><meta name="generator" content="Hexo 6.3.0"></head><body><canvas class="fireworks"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="文章信息">网站信息</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已阅读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E8%BF%99%E7%AF%87%E6%96%87%E6%A1%A3"><span class="toc-number">2.</span> <span class="toc-text">关于这篇文档</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%88%E5%86%B3%E6%9D%A1%E4%BB%B6"><span class="toc-number">3.</span> <span class="toc-text">先决条件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9E%E9%A1%BE"><span class="toc-number">4.</span> <span class="toc-text">回顾</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%8D%8F%E8%B0%83%EF%BC%88reconciliation%EF%BC%89"><span class="toc-number">4.1.</span> <span class="toc-text">什么是协调（reconciliation）?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%B0%83%EF%BC%88reconciliation%EF%BC%89"><span class="toc-number">4.1.1.</span> <span class="toc-text">协调（reconciliation）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%EF%BC%88update%EF%BC%89"><span class="toc-number">4.1.2.</span> <span class="toc-text">更新（update）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8F%E8%B0%83%E4%B8%8E%E6%B8%B2%E6%9F%93%EF%BC%88Reconciliation-versus-rendering%EF%BC%89"><span class="toc-number">4.2.</span> <span class="toc-text">协调与渲染（Reconciliation versus rendering）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8F%E8%B0%83%EF%BC%88Scheduling%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">协调（Scheduling）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%B0%83"><span class="toc-number">4.3.1.</span> <span class="toc-text">协调</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%EF%BC%88Work%EF%BC%89"><span class="toc-number">4.3.2.</span> <span class="toc-text">工作（Work）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFFiber%EF%BC%9F"><span class="toc-number">5.</span> <span class="toc-text">什么是Fiber？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Fiber%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">5.1.</span> <span class="toc-text">Fiber的结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#type-and-key"><span class="toc-number">5.1.1.</span> <span class="toc-text">type and key</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#child-and-sibling"><span class="toc-number">5.1.2.</span> <span class="toc-text">child and sibling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#return"><span class="toc-number">5.1.3.</span> <span class="toc-text">return</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pendingProps-%E5%92%8CmemoizedProps"><span class="toc-number">5.1.4.</span> <span class="toc-text">pendingProps 和memoizedProps</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pendingProps%E7%9A%84%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-number">5.1.5.</span> <span class="toc-text">pendingProps的优先级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#alternate"><span class="toc-number">5.1.6.</span> <span class="toc-text">alternate</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#flush"><span class="toc-number">5.1.6.1.</span> <span class="toc-text">flush</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#work-in-progress"><span class="toc-number">5.1.6.2.</span> <span class="toc-text">work-in-progress</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#output"><span class="toc-number">5.1.7.</span> <span class="toc-text">output</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#host-component"><span class="toc-number">5.1.7.1.</span> <span class="toc-text">host component</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AA%E6%9D%A5%E9%83%A8%E5%88%86"><span class="toc-number">6.</span> <span class="toc-text">未来部分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-number">7.</span> <span class="toc-text">参考文献</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g4mh0h5ecmj30uv0u0e82.jpg"></div><div class="author-info__name text-center">张熠</div><div class="author-info__description text-center">摸摸鱼</div><div class="follow-button"><a target="_blank" rel="noopener" href="https://github.com/crazyoctopusdan">Follow Me</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">20</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">15</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://zcxb.github.io">陈小波</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://www.yongsheng.us">康师傅</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://wukong1995.github.io">悟空</a></div></div></div><div id="content-outer"><div class="no-bg" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">Codan's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/archives">归档</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">分类</a></span></div><div id="post-info"><div id="post-title">React-Fiber学习笔记</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2019-07-01</time><div class="post-meta-wordcount"><span>本文字数: </span><span class="word-count">3.7k</span><span class="post-meta__separator">|</span><span>阅读时间: 11 分钟</span></div></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>React Fiber 是 React 核心算法的持续重新实现。这是React团队两年多研究的成果。</p>
+<p>React Fiber 的目标是提高其适合动画、布局和手势等区域的能力。其主功能是增量渲染:能够将渲染工作拆分为块并将其分散到多个帧上。</p>
+<p>其他关键功能包括:</p>
+<ol>
+<li>当新更新进来时，可以暂停、中止或重用工作;</li>
+<li>能够为不同类型的更新分配优先级;</li>
+<li>和新的并发基元。</li>
+</ol>
+<h1 id="关于这篇文档"><a href="#关于这篇文档" class="headerlink" title="关于这篇文档"></a>关于这篇文档</h1><p><code>Fiber</code>引入了几个新颖的概念，单靠查看代码是很难解决的。<br>这也是一项正在进行中的工作。<code>Fiber</code>是一个正在进行的项目，在完成之前可能会进行重大的重构。这篇文档是在这里记录它的设计。</p>
+<h1 id="先决条件"><a href="#先决条件" class="headerlink" title="先决条件"></a>先决条件</h1><p>我强烈建议您在继续之前熟悉以下资源:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://reactjs.org/blog/2015/12/18/react-components-elements-and-instances.html">React组件、元素和实例</a> - “组件”通常是一个重载的术语。牢牢把握这些条款至关重要。</li>
+<li><a target="_blank" rel="noopener" href="https://zh-hans.reactjs.org/docs/reconciliation.html">协调</a> - React 对帐算法的高级描述。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/reactjs/react-basic">React基本理论概念</a> - 无实现负担的响应概念模型的描述。其中一些在一读时可能没有意义。没关系，随着时间的推移，它更有意义。</li>
+<li><a target="_blank" rel="noopener" href="https://zh-hans.reactjs.org/docs/design-principles.html">React设计原则</a> - 特别注意<a target="_blank" rel="noopener" href="https://zh-hans.reactjs.org/docs/design-principles.html#scheduling">协调</a>部分。它做了很好的解释React Fiber的原因。</li>
+</ul>
+<h1 id="回顾"><a href="#回顾" class="headerlink" title="回顾"></a>回顾</h1><hr>
+<p>如果您尚未查看先决条件部分。</p>
+<p>在深入探讨新事物之前，让我们先回顾一下概念。</p>
+<h2 id="什么是协调（reconciliation）"><a href="#什么是协调（reconciliation）" class="headerlink" title="什么是协调（reconciliation）?"></a>什么是协调（reconciliation）?</h2><h3 id="协调（reconciliation）"><a href="#协调（reconciliation）" class="headerlink" title="协调（reconciliation）"></a>协调（reconciliation）</h3><p>React 算法用于将一个树与另一个树进行差异，以确定需要更改哪些部分。</p>
+<h3 id="更新（update）"><a href="#更新（update）" class="headerlink" title="更新（update）"></a>更新（update）</h3><p>用于渲染 React 应用的数据的更改。通常是”setState”的结果。最终导致重新渲染。<br>React 的 API 的核心思想是将更新视为导致整个应用重新渲染。这允许开发人员以声明性方式推理，而不是担心如何有效地将应用从任何特定状态转换到另一种状态(A 到 B，B 到 C，C 到 A，等等)。</p>
+<p>实际上，在每个更改上重新渲染整个应用仅适用于最琐碎的应用;在真实应用中，性能成本高得令人望而却步。React 具有优化功能，可创建整个应用重新渲染的外观，同时保持出色的性能。这些优化的大部分都是称为协调的过程的一部分。</p>
+<p>协调<code>Scheduling</code>是通常理解为”虚拟 DOM”背后的算法，高级描述如下所示:当您渲染 React 应用程序时，将生成描述该应用程序的节点树并将其保存在内存中。然后，此树将刷新到渲染环境 —— 例如，在浏览器应用程序的情况下，它将转换为一组 DOM 操作。更新应用时(通常通过 setState)将生成一个新树。新树与上一个树有差异，以计算更新渲染的应用所需的操作。</p>
+<p>尽管<code>Fiber</code>是对协调器的一个基础重写，但 React 文档中描述的高级算法将大致相同。要点如下:</p>
+<ul>
+<li>假定不同的组件类型生成完全不同的树。React 不会尝试将它们分散，而是完全替换旧树。</li>
+<li>使用key执行列表差异对比的时候，key应具备”稳定、可预测和唯一”的特性。</li>
+</ul>
+<h2 id="协调与渲染（Reconciliation-versus-rendering）"><a href="#协调与渲染（Reconciliation-versus-rendering）" class="headerlink" title="协调与渲染（Reconciliation versus rendering）"></a>协调与渲染（Reconciliation versus rendering）</h2><p>DOM 只是 React 可以渲染到的渲染环境之一，其他主要目标是通过响应原生进行本机的本机 iOS 和 Android 视图。(这就是为什么有点用错”虚拟 DOM”。）</p>
+<p>它可以支持这么多目标的原因是，React 的设计是使对帐和渲染是单独的阶段。协调者执行计算树的哪些部分已更改的工作;然后，渲染程序使用该信息实际更新渲染的应用。</p>
+<p>这种分离意味着 React DOM 和 React Native 可以在共享由 React 核心提供的同一协调器时使用自己的渲染器。</p>
+<p><code>Fiber</code> 重新实现协调器。它主要与渲染无关，尽管渲染器需要更改以支持(和利用)新的体系结构。</p>
+<h2 id="协调（Scheduling）"><a href="#协调（Scheduling）" class="headerlink" title="协调（Scheduling）"></a>协调（Scheduling）</h2><h3 id="协调"><a href="#协调" class="headerlink" title="协调"></a>协调</h3><p>确定何时应执行工作的过程。</p>
+<h3 id="工作（Work）"><a href="#工作（Work）" class="headerlink" title="工作（Work）"></a>工作（Work）</h3><p>必须执行的任何计算。工作通常是更新的结果(例如 setState)。</p>
+<blockquote>
+<p>在其当前实现中，React 递归遍历整棵Dom树，并在单个变化期间内调用整个更新树的渲染函数。但是，将来它可能会开始延迟某些更新以避免删除帧。<br>这是 React 设计中的一个常见主题。一些流行的库实现了”Push”方法，其中在新数据可用时就执行计算。但是，React 要坚持”Pull”方法，即计算可以推迟到必要的时刻再进行。<br>React 不是通用数据处理库。它是用于构建用户界面的库。我们认为，它在应用中处于独特的位置，可以知道哪些计算现在相关，哪些不相关。<br>如果某些内容位于屏幕外，我们可以延迟与它相关的任何逻辑。如果数据到达速度比帧速率快，我们可以合并和批量更新。我们可以将来自用户交互(如按钮单击引起的动画)的工作优先于不太重要的后台工作(例如渲染刚从网络加载的新内容)，以避免删除帧。</p>
+</blockquote>
+<p>要点如下:</p>
+<ul>
+<li>在 UI 中，不必立即应用每个更新;事实上，这样做可能会浪费，导致帧下降和降低用户体验。</li>
+<li>不同类型的更新具有不同的优先级 - 动画更新需要比来自数据存储的更新更快地完成。</li>
+<li>基于推送的方法要求应用(您，程序员)决定如何安排工作。基于拉取的方法使框架(React)变得智能，并为您做出这些决策。</li>
+</ul>
+<p>React 目前没有以明显地表示要使用该计划;一次更新会导致立即重新渲染整个子树。利用协调是 <code>Fiber</code> 背后的驱动理念就是重构React的核心算法。</p>
+<hr>
+<p>现在，我们已准备好深入了解<code>Fiber</code>的实现。接下来提到的内容比我们到目前为止讨论的内容更具有技术性。</p>
+<h1 id="什么是Fiber？"><a href="#什么是Fiber？" class="headerlink" title="什么是Fiber？"></a>什么是Fiber？</h1><p>接下来即将讨论React Fiber架构的核心，<code>Fiber</code>是一个比应用程序开发人员通常认为的低级抽象的概念，如果你发现自己在试图理解它时感到沮丧，不要感到气馁。不断尝试，你做的努力最终都会有意义。</p>
+<hr>
+<p>我们已经确定 <code>Fiber</code> 的主要目标是使 React 能够利用协调。具体来说，我们需要能够</p>
+<ul>
+<li>暂停工作，然后过一会再回来。</li>
+<li>为不同类型的工作分配优先级。</li>
+<li>重用以前完成的工作。</li>
+<li>如果不再需要操作了，则中止工作。</li>
+</ul>
+<p>为了做到这一点，我们首先需要一种方法，将工作分解为单元。从某种意义上说，这就是<strong>纤维（<code>Fiber</code>）</strong>。一个纤维表示一个工作单元。</p>
+<p>更进一步，让我们回到 React 组件作为数据函数的概念，通常表示为： v = f(d)</p>
+<p>因此，呈现 React 应用类似于调用其正文包含对其他函数的调用的函数，等等。这种类比在思考<code>Fiber</code>时很有用。</p>
+<p>计算机通常跟踪程序执行的方式是使用调用堆栈。执行函数时，将新堆栈帧添加到堆栈中。该堆栈帧表示该函数执行的工作。</p>
+<p>在处理 UI 的时候，可能出现问题是，如果一次执行的工作太多，就会导致动画丢弃帧并看起来不连贯。此外，如果某些操作被较新的更新取代，那么这些较旧的操作可能就没有必要。这就是 UI 组件和函数之间的比较大不相同的地方，因为组件比一般函数更具体。</p>
+<p>较新的浏览器(和React Native)实现 API，来帮助解决这一确切问题:<br>请求 IdleCallback 计划在空闲期间调用低优先级函数，并请求动画Frame 计划在下一个调用高优先级函数动画帧。</p>
+<p>问题是，为了使用这些 API，工程师们需要一种将渲染工作分解为增量单元的方法。如果仅依赖调用堆栈，它将继续工作，直到堆栈为空。</p>
+<p>思考痛点：</p>
+<ul>
+<li>如果我们能够自定义调用堆栈的行为以优化渲染 UI，这难道不是很棒吗?</li>
+<li>如果我们能随时中断调用堆栈并手动操作堆栈帧，这难道不是很棒吗?</li>
+</ul>
+<p>这就是React Fiber的目的，<code>Fiber</code>是堆栈的重新实现，专门用于React组件。您可以将单个<code>Fiber</code>视为<strong>虚拟堆栈框架</strong>。</p>
+<p>重新实现堆栈的优点是可以将堆栈框架保留在内存中，并在需要时执行它们。这对实现我们实现计划目标至关重要。</p>
+<p>除了<strong>协调</strong>之外，手动处理堆栈框架可以释放并发和错误边界等功能的潜力。本文将在之后的部分中介绍这些主题。</p>
+<p>在下一节中，文章将更多地介绍<code>Fiber</code>的结构。</p>
+<h2 id="Fiber的结构"><a href="#Fiber的结构" class="headerlink" title="Fiber的结构"></a>Fiber的结构</h2><p><em>注意:随着React对实现细节的更具体的了解，某些内容可能更改的可能性增加，文章内部的内容不能完全代表最新的React Fiber技术</em></p>
+<p>具体而言，<code>Fiber</code>是一个 JavaScript 对象，其中包含有关组件、其输入及其输出的信息。</p>
+<p><code>Fiber</code>对应于堆栈框架，但它也对应于组件的实例。</p>
+<p>下面是属于<code>Fiber</code>的一些重要字段。(此列表并非详尽列出所有字段奥）</p>
+<h3 id="type-and-key"><a href="#type-and-key" class="headerlink" title="type and key"></a><code>type</code> and <code>key</code></h3><p><code>Fiber</code>的类型和键与”React”元素的用途相同。(事实上，当从元素创建<code>Fiber</code>时，这两个字段将直接复制到该字段上。</p>
+<p><code>Fiber</code>的类型描述它对应的组件。对于复合组件，类型是函数或类组件本身。对于主机组件(div、span 等)，类型是字符串。</p>
+<p>从概念上讲，类型是函数(如 v = f(d))，其执行被堆栈框架跟踪。</p>
+<p>与类型一起，键<code>key</code>在调节期间使用，以确定是否可以重复使用<code>Fiber</code>。</p>
+<h3 id="child-and-sibling"><a href="#child-and-sibling" class="headerlink" title="child and sibling"></a><code>child</code> and <code>sibling</code></h3><p>这些字段指向其他Fiber,描述了Fiber的递归树结构。</p>
+<p><code>子Fiber</code>对应于组件的渲染方法返回的值。因此,在下面的示例中</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Parent</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">Child</span> /&gt;</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Parent</code>的子Fiber(子元素)对应于<code>Child</code>。</p>
+<p>同级字段用于呈现返回多个子级的情况(<code>Fiber</code>中的新功能!):</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Parent</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> [<span class="language-xml"><span class="tag">&lt;<span class="name">Child1</span> /&gt;</span></span>, <span class="language-xml"><span class="tag">&lt;<span class="name">Child2</span> /&gt;</span></span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>子Fiber</code>形成一个单独链接的列表,其头是第一个子元素。因此,在此示例中,<code>Parent</code>的子项为<code>Child1</code>,<code>Child1</code>的同级为<code>Child2</code>。</p>
+<p>回到我们的函数类比,您可以将<code>子Fiber</code>视为 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Tail_call">tail-called function</a></p>
+<h3 id="return"><a href="#return" class="headerlink" title="return"></a><code>return</code></h3><p><code>return Fiber</code>是程序在处理当前<code>Fiber</code>后应返回的<code>Fiber</code>。它在概念上与堆栈框架的返回地址相同。也可以将其视为<code>parent Fiber</code>。</p>
+<p>如果<code>Fiber</code>有多个<code>child Fibers</code>,则每个<code>child Fiber</code>的<code>return Fiber</code>是<code>parent Fiber</code>。因此,在上一节中的示例中,<code>child 1</code> 和<code>child 2</code>的<code>return Fiber</code>是<code>parent Fiber</code>。</p>
+<h3 id="pendingProps-和memoizedProps"><a href="#pendingProps-和memoizedProps" class="headerlink" title="pendingProps 和memoizedProps"></a><code>pendingProps</code> 和<code>memoizedProps</code></h3><p>从概念上讲,<code>props</code>是函数的参数。<code>Fiber</code>的<code>pendingProps</code>在其执行开始时设置,而<code>memoizedProps</code>在末尾设置。</p>
+<p>当传入的<code>pendingProps</code>等于<code>memoizedProps</code>时,它表明<code>Fiber</code>以前的输出可以重复使用,从而防止不必要的工作。</p>
+<h3 id="pendingProps的优先级"><a href="#pendingProps的优先级" class="headerlink" title="pendingProps的优先级"></a><code>pendingProps</code>的优先级</h3><p>指示由<code>Fiber</code>表示的 <code>props</code> 的优先级的数字。”React优先级（ReactPriorityLevel）”模块列出了不同的优先级及其表示的内容。</p>
+<p>除 NoWork(0)外,数字越大表示优先级较低。例如,可以使用以下函数检查光纤的优先级是否至少与给定级别相同:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">matchesPriority</span>(<span class="params">fiber, priority</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> fiber.<span class="property">pendingWorkPriority</span> !== <span class="number">0</span> &amp;&amp;</span><br><span class="line">         fiber.<span class="property">pendingWorkPriority</span> &lt;= priority</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此函数仅用于说明;它实际上不是 React Fiber 代码库的一部分。</p>
+<p>协调程序（scheduler）使用优先级字段搜索要执行的下一个工作单元。</p>
+<p>此算法将在以后的章节中讨论。</p>
+<h3 id="alternate"><a href="#alternate" class="headerlink" title="alternate"></a>alternate</h3><h4 id="flush"><a href="#flush" class="headerlink" title="flush"></a><em>flush</em></h4><p>刷新（flush）Fiber 是将他的输出渲染在屏幕上。</p>
+<h4 id="work-in-progress"><a href="#work-in-progress" class="headerlink" title="work-in-progress"></a><em>work-in-progress</em></h4><p>尚未完成的Fiber;从概念上讲,是尚未从堆栈框架返回的 <code>Fiber</code>。</p>
+<p>在任何时候,组件实例最多具有两个与其对应的 <code>Fiber</code>: 当前的 Fiber <code>the current Fiber</code>、刷新的Fiber <code>flushed fiber</code> 和 尚未完成的Fiber <code>work-in-progress Fiber</code>。</p>
+<p><code>the current Fiber</code>的备用是<code>work-in-progress Fiber</code>,而<code>work-in-progress Fiber</code>的备用是<code>the current Fiber</code>。</p>
+<p>使用称为克隆Fiber <code>cloneFiber</code> 的功能 懒创建（ lazily using ） <code>Fiber</code>的备用<code>Fiber</code>。<code>cloneFiber</code> 将尝试重用 <code>Fiber</code> 的备用对象<code>work-in-progress Fiber</code>(如果存在)而不是始终创建新对象,从而最大限度地减少分配。</p>
+<p>工程师们应该将 备用字段 <code>alternate</code> 作为实现 <code>Fiber</code>的细节,但它在代码库中经常弹出,因此在此处讨论它非常有价值。</p>
+<h3 id="output"><a href="#output" class="headerlink" title="output"></a>output</h3><h4 id="host-component"><a href="#host-component" class="headerlink" title="host component"></a><em>host component</em></h4><p>React 应用程序的叶节点。它们特定地存在于渲染环境(例如,在浏览器应用中,它们是”div”,”span”等)。在 JSX 中,它们使用 <strong>小写的名称标签</strong> 表示。</p>
+<p>从概念上讲,<code>Fiber</code>的输出是函数的返回值。</p>
+<p>每个<code>Fiber</code>最终都有输出,但输出仅由<strong>host component</strong>在叶节点上创建，这个输出然后再向树上转移。</p>
+<p>最终提供给渲染器的输出的内容将刷新渲染到展示的环境中。渲染器有责任定义这个最终输出的内容是应该 创建 还是 更新。</p>
+<h1 id="未来部分"><a href="#未来部分" class="headerlink" title="未来部分"></a>未来部分</h1><p>这就是现在所有的一切,但本文档还远远不够完整。后续部分将介绍更新整个生命周期中使用的算法。要涵盖的主题包括:</p>
+<ul>
+<li>协调程序（scheduler）如何找到要执行的下一个工作单元。</li>
+<li>如何通过 Fiber 树跟踪和传播优先级。</li>
+<li>计划程序如何知道何时暂停和恢复工作。</li>
+<li>如何刷新工作并标记为已完成。</li>
+<li>副作用(如生命周期方法)的工作原理。</li>
+<li>什么是协同例程,以及如何使用它来实现上下文和布局等功能。</li>
+</ul>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p><a target="_blank" rel="noopener" href="https://github.com/acdlite/react-fiber-architecture">Fiber</a><br><a target="_blank" rel="noopener" href="https://zh-hans.reactjs.org/docs/faq-internals.html#what-is-react-fiber">Virtual DOM 及内核</a></p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">作者: </span><span class="post-copyright-info"><a href="mailto:undefined">张熠</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://crazyoctopusdan.github.io/2019/07/01/React-Fiber%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">https://crazyoctopusdan.github.io/2019/07/01/React-Fiber%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/React/">React</a></div><div class="addthis_inline_share_toolbox pull-right"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=undefined" async></script><nav id="pagination"><div class="prev-post pull-left"><a href="/2019/07/10/Http%E8%AF%B7%E6%B1%82%E7%9A%84%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3/"><i class="fa fa-chevron-left">  </i><span>Http请求的深入了解</span></a></div><div class="next-post pull-right"><a href="/2019/06/27/GMTC%E5%A4%A7%E4%BC%9A%E8%AE%B0/"><span>GMTC大会记</span><i class="fa fa-chevron-right"></i></a></div></nav></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2023 By 张熠</div><div class="framework-info"></div><div class="footer_custom_text">欢迎来到Codan的博客 | <i class="fa fa-envelope-o" aria-hidden="true"></i><a href="mailto:contactcodan@163.com">contactcodan@163.com</a> | <i class="fa fa-weixin" aria-hidden="true"></i>zy840271360</div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.6.1"></script><script src="/js/fancybox.js?version=1.6.1"></script><script src="/js/sidebar.js?version=1.6.1"></script><script src="/js/copy.js?version=1.6.1"></script><script src="/js/fireworks.js?version=1.6.1"></script><script src="/js/transition.js?version=1.6.1"></script><script src="/js/scroll.js?version=1.6.1"></script><script src="/js/head.js?version=1.6.1"></script><script src="/js/search/local-search.js"></script><script>if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+  $('#nav').addClass('is-mobile')
+  $('footer').addClass('is-mobile')
+}</script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">文章搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索封面标题(-^〇^-)"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>
